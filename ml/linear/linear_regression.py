@@ -7,16 +7,16 @@ class LinearRegression:
     def __init__(self):
         return
 
-    # compute mse
+    # 计算均方误差
     def compute_error(self, X, y, w, b):
-        totalError = 0
+        total_error = 0
         row = float(X.shape[0])
 
         # 使用矩阵运算，计算均方误差
-        totalError = np.square(y - np.dot(X, w) - b)
-        totalError = np.sum(totalError, axis=0)
+        total_error = np.square(y - np.dot(X, w) - b)
+        total_error = np.sum(total_error, axis=0)
 
-        return totalError/row
+        return total_error/row
 
     # 计算梯度
     def compute_gradient(self, X, y, w_current, b_current, learning_rate):
