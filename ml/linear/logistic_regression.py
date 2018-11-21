@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 import numpy as np
+import pandas as pd
 
 ########################################################################
 # 逻辑回归算法
@@ -27,7 +28,7 @@ class LogisticRegression:
     # 初始化特征矩阵X
     def __init_X(self, X):
         # 将X格式转换成np.matrix
-        X_matrix = np.mat(X)
+        X_matrix = np.mat(X.values)
 
         # 为X增加常数bias项列
         row, _ = X_matrix.shape
@@ -109,7 +110,7 @@ class LogisticRegression:
         # 将X格式转换为np.matrix
         X_matrix = self.__init_X(X)
         # 将y格式转换为np.matrix
-        y_matrix = np.reshape(np.mat(y), (-1, 1))
+        y_matrix = np.mat(y.values.reshape(-1, 1))
 
         # 根据选择的优化器进行迭代
         if optimization == 2:

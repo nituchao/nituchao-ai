@@ -21,14 +21,11 @@ def main():
 
 def main2():
          #读取数据（这里只有两个特征）
-    filename = "/Users/liang/Documents/workspace/python/nituchao-deeplearning/data/data_lr.csv"
-    dataMat = []
-    labelMat = []
-    fr = open(filename)
-    for line in fr.readlines():
-        lineArr = line.strip().split()
-        dataMat.append([float(lineArr[0]), float(lineArr[1])])   #前面的1，表示方程的常量。比如两个特征X1,X2，共需要三个参数，W1+W2*X1+W3*X2
-        labelMat.append(int(lineArr[2]))
+    filename = "/Users/liang/Documents/workspace/python/nituchao-deeplearning/data/data_lr.txt"
+    data = pd.read_csv(filename, delimiter=',', header=None)
+
+    dataMat = data.iloc[:, 0:2]
+    labelMat = data.iloc[:, 2]
 
     lr = LogisticRegression()
     lr.fit(dataMat, labelMat, optimization=1)
@@ -37,10 +34,11 @@ def main2():
 
     print('z = {} + {}*x + {}*y'.format(bias, weights[0], weights[1]))
 
-    X = dataMat[1]
-    y = labelMat[1]
-    y_predict = lr.predict(X)
-    print('x is {}, y is {}, predict_y is {}.'.format(X, y, y_predict))
+    for i in range(len(labelMat)):
+        X = dataMat.iloc[i, :]
+        y = labelMat.values[i]
+        y_predict = lr.predict(X)
+        print('x is {}, y is {}, predict_y is {}.'.format(X.values, y, y_predict))
 
 if __name__ == "__main__":
     main2()
