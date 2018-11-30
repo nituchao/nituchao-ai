@@ -37,6 +37,10 @@ class LogisticRegression:
 
         return X_matrix_with_bias
 
+    # 初始化标签列y
+    def __init_y(self, y):
+        return np.mat(y.values.reshape(-1, 1))
+
     # 梯度上升求最优参数
     ########################################################################
     # X_in: 特征矩阵
@@ -110,7 +114,7 @@ class LogisticRegression:
         # 将X格式转换为np.matrix
         X_matrix = self.__init_X(X)
         # 将y格式转换为np.matrix
-        y_matrix = np.mat(y.values.reshape(-1, 1))
+        y_matrix = self.__init_y(y)
 
         # 根据选择的优化器进行迭代
         if optimization == 2:
