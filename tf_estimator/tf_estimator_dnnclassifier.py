@@ -53,9 +53,6 @@ def model_fn(features, model_config):
         feature_columns=feature_columns,
         n_classes=3,
         config=model_config)
-
-def predit_fn(dnn_model):
-    SPECIES = ['Setosa', 'Versicolor', 'Virginica']
     
 def build_fn(model_config, model_params):
     # checkout train, verify, test dataset
