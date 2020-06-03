@@ -54,7 +54,7 @@ def model_fn(features, model_config):
         n_classes=3,
         config=model_config)
     
-def build_fn(model_config, model_params):
+def exec_fn(model_config, model_params, train_steps = 5000):
     # checkout train, verify, test dataset
     train_x, verify_x, test_x, train_y, verify_y, test_y = sample_fn()
 
@@ -62,7 +62,7 @@ def build_fn(model_config, model_params):
     dnn_model = model_fn(train_x, model_config)
 
     # model train
-    dnn_model.train(input_fn=lambda: input_fn(train_x, train_y, model_stage='train'), steps=5000)
+    dnn_model.train(input_fn=lambda: input_fn(train_x, train_y, model_stage='train'), steps=train_steps)
 
     # model verify
     verify_result = dnn_model.evaluate(input_fn=lambda: input_fn(verify_x, verify_y, model_stage='verify'), steps=1)
@@ -95,8 +95,11 @@ def main(_):
         "dropout": 0.001
     }
 
+    # train steps
+    train_steps = 5000
+
     # train, verify and test model
-    build_fn(model_config, model_params)
+    exec_fn(model_config, model_params, train_steps)
 
     return 0
 
