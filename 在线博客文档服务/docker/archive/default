@@ -1,0 +1,26 @@
+server {
+    listen       80;
+    listen  [::]:80;
+
+    server_name  localhost;
+    root        /var/www/html;
+    index       index.php;
+
+    # 下面直接照写
+	location / {
+    	try_files $uri $uri/ /index.php$is_args$args;
+	}
+
+    location ~ \.php$ {
+       # 注意这里是 fpm 所在服务器上的 *.php 文件路径
+       root           /var/www/html;
+       # 这里不使用本地回环，因为指向的是容器内部，请改为 php-fpm 服务器所在的 IP 和端口
+       fastcgi_pass   127.0.0.1:9000;
+       fastcgi_index  index.php;
+       # 注意修改路径，否则可能会出现访问 404 问题
+       # fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+       fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+       include        fastcgi_params;
+    }
+}
+

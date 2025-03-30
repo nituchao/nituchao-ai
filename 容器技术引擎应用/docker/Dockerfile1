@@ -1,0 +1,29 @@
+# dockerfile: ubuntu-dev.dockerfile
+FROM --platform=linux/amd64 ubuntu:24.04
+
+# ssh public key for host client ssh login without passowrd
+ARG HOST_SSH_PUB_KEY="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCW49fw7yFGR3q2SOnK4MAzKS8ZxM8kqVy9K1onMn2ssjXAoDT17dOJ3yTQdjG2PQ837qqZ8v9lJd5y8or3tEQzbhcx9+uF8ZDyWAIP3FkqQDcX2uiWB/D2h4J+9LjekJbewmICKEsDeBQFgjE3bHZbBtnyBNOJlTI6NdeMCOzMbwT5od0JQuwUESTBCuRr+4CzScE7UtcnaHa/5hYh+AQqQ+kTeaJ4WgnvnaoRTJE2g5HH3/X+Wj5UMiOWXfFpO7zACbJ0GeLICe/CNvTk3+L8mcDF89sHniAS+ogIBNqWQBeezVNTjZSal2mE+5AEJd0jFvjmA8gkf7Yr1Fzc35pNf7ydsT1G6IKxBki8Ib4n3irBWJnIYHl5+CkfzjThSnl8Pn0tIu3D6SoW/ywVEGhkmJZ7bjkEvs3mvbYGyuNJ6XwlXfZaZRSrN607ztvmYlhXum1PrHFSwCCHo4HZ7Hn3bpV+K+pOLxtrUJZMjGbYt4PeuZ0Vpe13oFV1CCr5aeVakxWjhniUqm38c6uRYsUNxxujGPZgns1X0hcA3l3iF1iZyf/PQKcExUwbY3AiS8jI/sEh395wql3erGF7Y506EfwIO1T8dIS9/CZVX1clS2dLd656e3l7lq167xjXDZSLktu1BRFCiMLKaWl6Xn5epjCT81zRy62IHOiQ7jPoOQ== zhangliang.thanks@bytedance.com"
+
+RUN apt update && apt install openssh-server sudo -y
+RUN apt -y --no-install-recommends install bzip2 \
+    git \
+    vim
+
+RUN mkdir -p /root/.ssh && touch /root/.ssh/authorized_keys && echo $HOST_SSH_PUB_KEY >> /root/.ssh/authorized_keys
+RUN mkdir -p /opt/home/workspace/codes
+RUN mkdir -p /opt/home/workspace/data
+RUN mkdir -p /opt/home/workspace/usr
+
+RUN echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
+
+RUN echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
+
+RUN ssh-keygen -A
+
+RUN echo 'root:rootroot' | chpasswd
+
+RUN service ssh start
+
+EXPOSE 22
+
+CMD ["/usr/sbin/sshd","-D"]

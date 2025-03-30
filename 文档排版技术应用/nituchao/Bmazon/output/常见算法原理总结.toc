@@ -1,0 +1,25 @@
+\contentsline {section}{\numberline {1}PID算法在成本控制领域的应用}{4}{section.1}%
+\contentsline {subsection}{\numberline {1.1}PID控制算法简介}{4}{subsection.1.1}%
+\contentsline {paragraph}{关于P}{5}{section*.2}%
+\contentsline {paragraph}{关于I}{5}{section*.3}%
+\contentsline {paragraph}{关于D}{5}{section*.4}%
+\contentsline {subsection}{\numberline {1.2}PID算法简单代码}{5}{subsection.1.2}%
+\contentsline {subsubsection}{\numberline {1.2.1}位置式PID}{6}{subsubsection.1.2.1}%
+\contentsline {subsubsection}{\numberline {1.2.2}增量式PID}{6}{subsubsection.1.2.2}%
+\contentsline {subsection}{\numberline {1.3}参考资料}{8}{subsection.1.3}%
+\contentsline {section}{\numberline {2}Uplift算法在成本定价领域的应用}{9}{section.2}%
+\contentsline {section}{\numberline {3}因果推断建模}{10}{section.3}%
+\contentsline {subsection}{\numberline {3.1}参考资料}{10}{subsection.3.1}%
+\contentsline {section}{\numberline {4}多约束整数规划}{11}{section.4}%
+\contentsline {subsection}{\numberline {4.1}贪婪算法}{11}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}二分算法}{11}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}单纯形法}{11}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}分枝界定法}{11}{subsection.4.4}%
+\contentsline {subsection}{\numberline {4.5}启发式算法}{11}{subsection.4.5}%
+\contentsline {subsection}{\numberline {4.6}拉格朗日乘子法}{11}{subsection.4.6}%
+\contentsline {subsection}{\numberline {4.7}同步坐标下降法}{11}{subsection.4.7}%
+\contentsline {section}{\numberline {5}ROI公式推导}{12}{section.5}%
+\contentsline {subsection}{\numberline {5.1}ROI公式}{12}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}CVR评分选择}{12}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}边际ROI公式推导}{12}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}正比公式推导}{12}{subsection.5.4}%

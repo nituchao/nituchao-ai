@@ -1,3 +1,5 @@
 {
-    "python.pythonPath": "/Users/zhangliang/anaconda3/envs/magellan_dev/bin/python"
+    "files.watcherExclude": {
+        "**/target": true
+    }
 }

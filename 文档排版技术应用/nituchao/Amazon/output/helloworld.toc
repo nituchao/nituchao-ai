@@ -1,0 +1,10 @@
+\contentsline {section}{\numberline {1}PID算法在成本控制领域的应用}{2}{section.1}%
+\contentsline {subsection}{\numberline {1.1}PID控制算法简介}{2}{subsection.1.1}%
+\contentsline {section}{\numberline {2}Uplift算法在成本定价领域的应用}{3}{section.2}%
+\contentsline {paragraph}{Tian'anmen Square}{3}{paragraph*.2}%
+\contentsline {subparagraph}{Chairman Mao}{3}{subparagraph*.3}%
+\contentsline {section}{\numberline {3}ROI公式推导}{4}{section.3}%
+\contentsline {subsection}{\numberline {3.1}ROI公式}{4}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}CVR评分选择}{4}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}边际ROI公式推导}{4}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}正比公式推导}{4}{subsection.3.4}%

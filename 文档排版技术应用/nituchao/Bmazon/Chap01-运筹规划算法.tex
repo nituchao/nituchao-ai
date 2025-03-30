@@ -1,0 +1,241 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% PID算法字啊成本控制领域的应用
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{PID算法在成本控制领域的应用}
+常见的成本控制方法可分为认为干预和算法自动控制两种。顾名思义，人为干预是通过人工实时监控广告投放
+情况，当发现实际成本低于或超出预期预算时，通过人工调整广告出价或修改人群定向等方式调节投放花费；
+算法自动控制是指采用相关算法，监控投放成本，并根据异常自动调节广告出价，达到控制成本的目的。
+\subsection{PID控制算法简介}
+PID算法包含了比例（Proportion）、积分（Integration）、微分（Differentiation）三个环节，
+其根据被控对象实际输出与目标值的偏差，按照三个环节进行运算，最终达到稳定系统的目的。\\
+
+简答的说，$k_{p}$代表现在，$k_{i}$代表过去，$k_{d}$代表未来。在实际应用中还是需要考虑具体参
+数大小，可以通过grid search，根据相应时间、超调量、稳态误差指标，来综合考虑PID值。\\
+
+PID调价也存在着一些缺陷，简单泛化能力强式优点也是缺点，只需要根据设定$cpc$和实际$cpc$的反馈就
+能够调节。但是，在某些固定场景下，$cpc$的波动会呈现固定的pattern，例如在某几个小时流量指令非常
+好，$cpc$会特别低，这就需要使用机器学习来记忆到哪些campaingn在哪些时间点需要提高价格，使用强化
+学习出价在充分利用投放数据、建立MDP模型、序列号决策这些方面就有了天然优势。\\
+
+PID具体公式如下：
+\begin{equation}
+    \begin{split}
+        \displaystyle err_{t} &= target_{cpc_{t}} - real_{cpc_{t}}\\
+        \displaystyle \Delta_{t} &= k_{p}(err(t) + \frac{1}{k_{i}} \int{err(t)\mathrm{d}t } +k_{d}\frac{\mathrm{d} err(x)}{\mathrm{d} t} ) \\
+        \displaystyle \lambda{_{t+1}} &= \lambda_{t} + \Delta_{t} 
+    \end{split}
+\end{equation}
+
+其中：
+\begin{itemize}
+    \item $err\_{t}$: 第t轮PID的误差值
+    \item $real\_{cpc_{t}}$: 第t轮PID的实际值
+    \item $target\_{cpc_{t}}$: 第t轮PID的目标值
+    \item $k\_{p}$: 比例增益
+    \item $k\_{i}$: 积分时间常数
+    \item $k\_{d}$: 微分时间常数
+    \item $\Delta$: 第t轮PID的增量系数
+    \item $\lambda_{t}$: 第t轮PID的调控系数
+    \item $\lambda_{t-1}$: 第t-1轮PID的调控系数
+\end{itemize}
+
+\paragraph{关于P}
+$k_{p}$是比例系数，假设目标cpc 0.4，实际cpc 0.2，误差是0.2，$k_{p}$越大，反应幅度就会越大，
+新的$\lambda$就会增加很多，出价就会增加很多，但是$k_{p}$不能够过大，不然会导致超额调整，出价过
+高。所以，$k_{p}$代表了根据当前误差反应的比例。
+
+\paragraph{关于I}
+$k_{p}$的存在是为了解决稳态误差。\\
+假如当前cpc偏低，每个小时都提高价格，但是市场价格（出价第二高的广告主出价）也在下降，所以，虽然每
+个小时都按照PID调控系数提价，但是由于市场价格在降价，导致基于PID的每次提价都没有提上去。像这种如
+果一直存在，我们称之为稳态误差。积分的存在就是通过过去差值的经验来调整出价，来消除这个稳态误差。
+
+但是，实际投放过程中基本不会存在这样的稳态，因为竞价系统是动态的，只能说市场价格可能随着时间有些固
+定的变化，但是变化不一定式稳定方向，所以$k_{i}$值在实际使用中需要慎重，如果设置特别大，会导致上个
+小时已经不存在的误差，影响到当前小时，所以$k_{i}$即使要使用，最好设置的非常小。
+
+\paragraph{关于D}
+$k_{d}$项经常被称为微分项，当两次调控间隔十分小，$(err_{t} - err_{t-1})/1$计算的就是斜率，
+如果间隔十分小，那么这个斜率就可以一定程度体现次$err$的走向，这也是为社么说微分项代表未来。但是，
+如果两次间隔十分大、或者噪音非常多，微分项的作用就不大了。对于1小时调控一次的PID调价，$k_{d}$项
+可以为0。实际上，很多PID控制器仅用$k_{p}$和$k_{i}$就已经足够了。
+
+\subsection{PID算法简单代码}
+PID控制算法可以分为位置时PID和增量式PID控制算法。
+两者的区别：
+\begin{itemize}
+    \item （1）位置式PID控制的输出与整个过去的状态有关，用到了误差的累加值。而增量式PID的输出
+    只与当前拍和前两拍的误差有关，因此位置式PID控制的累计误差相对更大。
+    \item （2）增量式PID控制输出的是控制量增量，如果计算机出现故障，误动作影响较小，而执行机构
+    本身有记忆功能，仍可保持原位，不会严重影响系统的工作，而位置式的输出直接对应对象的输出，因此
+    对系统影响较大。
+\end{itemize}
+
+\subsubsection{位置式PID}
+\begin{equation}
+    \displaystyle u(k) = K_{P}e(k) + K_{I}\sum_{i=0}e(i) + K_{D}[e(k) - e(k-1)]
+\end{equation}
+%% Python代码
+\begin{python}
+# 位置型PID
+def pid_positional(budget_target, budget_error):
+    P = budget_error[0]
+    I = sum(Budget_error)
+    D = budget_error[0] - Budget_error[1]
+
+    return kp * P + ki * I + kd * D
+\end{python}
+
+\subsubsection{增量式PID}
+%% 数学公式
+\begin{equation}
+    \begin{split}
+        \displaystyle \Delta u(k) &= u(k) - u(k-1)\vspace{1.5ex} \\
+        \displaystyle &= K_{p}[e(k) - e(k-1)] + K_{I}e(k) + K_{D}[e(k) - 2e(k-1) + e(k-2)]
+    \end{split}
+\end{equation}
+%% Python代码
+\begin{python}
+import pandas as pd
+import random
+import matplotlib.pyplot as plt
+
+# 模拟调控N天，第1天无法用PID，从第2天开始施加PID调控
+N = 10
+
+# 每天目标预算
+Budget_target = 100
+
+# 每天实际花出预算
+Budget_real = [0] * N                       # 历次PID调控给出的真实预算
+Budget_real[1] = 80
+
+# 调控后每天预期预算
+Budget_expected_positional = [0] * N
+Budget_expected_incremental = [0] * N       # 历次PID调控后预期预算
+Budget_expected_incremental_u = [0] * N     # 历次PID调控后预算差值 = 预期预算 - 目标预算
+
+# PID系数
+kp = 0.5
+ki = 0.5
+kd = 0.5
+
+# 积分天数
+T = 3
+
+# 增量型PID
+def pid_incremental(Budget_target, Budget_error, u):
+
+  delta = kp * (Budget_error[0] - Budget_error[1]) + ki * Budget_error[0] + kd * (Budget_error[0] - 2 * Budget_error[1] + Budget_error[2])
+
+  return delta + u
+
+# 模拟每天实际花出预算，在目标预算和预期预算之间
+def get_budget(Budget_min, Budget_max):
+  return random.uniform(Budget_min, Budget_max)
+
+# 第2天开始PID调控
+for i in range(2, N):
+  Budget_error = []
+  for j in range(i-1, max(0, i-T), -1):
+    Budget_error.append(Budget_target - Budget_real[j])
+  if len(Budget_error) < T:
+    Budget_error = Budget_error + [0] * (T - len(Budget_error))
+
+  # 增量型PID
+  Budget_expected_incremental_u[i] = pid_incremental(Budget_target, Budget_error, Budget_expected_incremental_u[i-1])
+  Budget_expected_incremental[i] = Budget_target + Budget_expected_incremental_u[i]
+  Budget_min = min(Budget_target, Budget_expected_incremental[i])
+  Budget_max = max(Budget_target, Budget_expected_incremental[i])
+  Budget_real[i] = get_budget(Budget_min, Budget_max)
+\end{python}
+
+\subsection{参考资料}
+\begin{itemize}
+    \item \href{https://www.infoq.cn/article/akkwpvsnium9tmhhuu3f}{PID 算法在广告成本控制领域的应用}
+    \item \href{https://www.zhihu.com/tardis/zm/art/139244173?source_id=1003}{广告出价--如何使用PID控制广告投放成本}
+\end{itemize}
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Uplift算法在成本定价领域的应用
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Uplift算法在成本定价领域的应用}
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 因果推断建模
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{因果推断建模}
+\subsection{参考资料}
+\begin{itemize}
+    \item \href{https://tech.meituan.com/2024/01/25/identify-causal-effect.html}
+    {分布式因果推断在美团履约平台的探索和实践}
+    \item \href{https://www.modb.pro/db/601027}{因果推断之Uplift Model|CausalML实战篇}
+    \item \href{https://github.com/uber/causalml}{CausalML: A Python Package for
+    Uplift Modeling and Causal Inference with ML}
+    \item \href{https://causalml.readthedocs.io/en/latest/about.html}{About 
+    CausalML}
+\end{itemize}
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 多约束整数规划
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{多约束整数规划}
+\subsection{贪婪算法}
+\subsection{二分算法}
+\subsection{单纯形法}
+\subsection{分枝界定法}
+\subsection{启发式算法}
+\subsection{拉格朗日乘子法}
+\subsection{同步坐标下降法}
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% ROI公式推导
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{ROI公式推导}
+\subsection{ROI公式}
+\begin{align*}
+    \displaystyle  ROI = \frac{CVR^{30} - CVR^{5}}{CVR^{30} * 30 - CVR^{5} * 5}  \propto \frac{CVR^{30} - CVR^{5}}{CVR^{5}}
+\end{align*}
+\subsection{CVR评分选择}
+假定选择两个价格档位，最低档5元，最高档30元（选择最高档和最低档，价格敏感性较为明显，容易学出来）。
+\subsection{边际ROI公式推导}
+边际ROI公式推导
+\begin{equation}
+    \begin{split}
+        \displaystyle \mbox{边际}ROI &= \frac{bk^{30} - bk^{5}}{cost^{30} - cost^{5}}\vspace{1.5ex} \\
+        \displaystyle               &= \frac{bk^{30} - bk^{5}}{bk^{30} * 30 - bk^{5} * 5}\vspace{1.5ex} \\
+        \displaystyle               &= \frac{CVR^{30} - CVR^{5}}{CVR^{30} * 30 - CVR^{5} * 5}\vspace{1.5ex}
+    \end{split}
+\end{equation}
+分子分母同时除以曝光量UV，假设5元档和30元档的曝光量UV是拉齐的，（如果不拉齐，就需要归一操作）
+\subsection{正比公式推导}
+正比公式推导
+\begin{equation}
+    \begin{split}
+        \displaystyle \mbox{边际}CAC &= \frac{1}{\mbox{边际}ROI}\vspace{1.5ex} \\
+        \displaystyle               &= \frac{CVR^{30} * 30 - CVR^{5} * 5}{CVR^{30} - CVR^{5}}\vspace{1.5ex} \\
+        \displaystyle               &= \frac{CVR^{30} * 30 - CVR^{5} * 30 + CVR^{5} * 30 - CVR^{5} * 5}{CVR^{30} - CVR^{5}}\vspace{1.5ex}  \\
+        \displaystyle               &= 30 + \frac{CVR^{5} * 25}{CVR^{30} -CVR^{5}}\vspace{1.5ex} \\
+        \displaystyle               &= 30 + \frac{CVR^5}{CVR^{30} - CVR^{5}} * 25\vspace{1.5ex}
+    \end{split}
+\end{equation}
+因此，$\displaystyle \mbox{边际}CAC \propto \frac{CVR^{5}}{CVR^{30} - CVR^{5}}$
+因此，$\displaystyle \mbox{边际}ROI \propto \frac{CVR^{5}}{CVR^{30} - CVR^{5}}$
+\newpage
+
+\begin{align*}
+    &\max \sum_{i,j}x_{i,j}\cdot bind\_card_{i,j} \\
+    &s.t.\quad
+    \sum_{i,j=1}x_{i,j}\cdot (all\_ctr_{i,j} - bytepay\_ctr_{i,j}) <= \beta \cdot \left | PV \right | \cdot all\_ctr_{emp} \\
+    \sum_{j}x_{i,j} = 1, x_{i,j} \in {0, 1}
+\end{align*}
+
+\begin{align*}
+    &\max \sum_{i,j}x_{i,j}\cdot bind\_card_{i,j} \\
+    &s.t.& \sum_{i,j=1}x_{i,j}\cdot (all\_ctr_{i,j} - bytepay\_ctr_{i,j}) <= \beta \cdot \left | PV \right | \cdot all\_ctr_{emp} \\
+        & \sum_{j}x_{i,j} = 1, x_{i,j} \in {0, 1}
+\end{align*}

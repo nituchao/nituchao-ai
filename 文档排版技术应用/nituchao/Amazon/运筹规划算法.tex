@@ -1,0 +1,61 @@
+\section{PID算法在成本控制领域的应用}
+常见的成本控制方法可分为认为干预和算法自动控制两种。顾名思义，人为干预是通过人工实时监控广告投放情况，当发现实际成本低于或超出预期预算时，通过人工调整广告出价或修改人群定向等方式调节投放花费；算法自动控制是指采用相关算法，监控投放成本，并根据异常自动调节广告出价，达到控制成本的目的。
+\subsection{PID控制算法简介}
+PID算法包含了比例（Proportion）、积分（Integration）、微分（Differentiation）三个环节，其根据被控对象实际输出与目标值的偏差，按照三个环节进行运算，最终达到稳定系统的目的，其具体公式如下：
+\begin{equation}
+    \begin{array}{l}
+        Err_{t} = target_{cpc_{t}} - real_{cpc_{t}}\\
+        U(t) = K_{p}(err(t) + \frac{1}{T_{i}} \int{err(t)\mathrm{d}t } + T_{d}\frac{\mathrm{d} err(x)}{\mathrm{d} t} )  
+    \end{array}
+\end{equation}
+
+其中：
+\begin{itemize}
+    \item K\_{p}: 比例增益
+    \item T\_{i}: 积分时间常数
+    \item T\_{d}: 微分时间常数
+    \item err: 误差值
+\end{itemize}
+\href{https://www.infoq.cn/article/akkwpvsnium9tmhhuu3f}{PID 算法在广告成本控制领域的应用}
+
+\newpage
+\section{Uplift算法在成本定价领域的应用}
+\paragraph{Tian'anmen Square}
+is in the center of Beijing
+\subparagraph{Chairman Mao}
+is in the center of 天安门广场。
+\newpage
+%%
+%% ROI公式推导
+%%
+\section{ROI公式推导}
+\subsection{ROI公式}
+\begin{equation}
+    ROI = \frac{CVR^{30} - CVR^{5}}{CVR^{30} * 30 - CVR^{5} * 5}  \propto \frac{CVR^{30} - CVR^{5}}{CVR^{5}}
+\end{equation}
+\subsection{CVR评分选择}
+假定选择两个价格档位，最低档5元，最高档30元（选择最高档和最低档，价格敏感性较为明显，容易学出来）。
+\subsection{边际ROI公式推导}
+边际ROI公式推导
+\begin{equation}
+    \begin{array}{l}
+        边际ROI = \frac{bk^{30} - bk^{5}}{cost^{30} - cost^{5}} \\
+        = \frac{bk^{30} - bk^{5}}{bk^{30} * 30 - bk^{5} * 5} \\
+        = \frac{CVR^{30} - CVR^{5}}{CVR^{30} * 30 - CVR^{5} * 5}
+    \end{array}
+\end{equation}
+分子分母同时除以曝光量UV，假设5元档和30元档的曝光量UV是拉齐的，（如果不拉齐，就需要归一操作）
+\subsection{正比公式推导}
+正比公式推导
+\begin{equation}
+    \begin{array}{l}
+        边际CAC = \frac{1}{边际ROI} \\
+        = \frac{CVR^{30} * 30 - CVR^{5} * 5}{CVR^{30} - CVR^{5}}    \\
+        = \frac{CVR^{30} * 30 - CVR^{5} * 30 + CVR^{5} * 30 - CVR^{5} * 5}{CVR^{30} - CVR^{5}}  \\
+        = 30 + \frac{CVR^{5} * 25}{CVR^{30} -CVR^{5}}  \\
+        = 30 + \frac{CVR^5}{CVR^{30} - CVR^{5}} * 25
+    \end{array}
+\end{equation}
+因此，$边际CAC \propto \frac{CVR^{5}}{CVR^{30} - CVR^{5}}$
+因此，$边际ROI \propto \frac{CVR^{5}}{CVR^{30} - CVR^{5}}$
+\newpage
